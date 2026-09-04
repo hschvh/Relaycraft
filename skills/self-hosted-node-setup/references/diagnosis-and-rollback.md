@@ -56,14 +56,35 @@ If a change fails a gate, stop the service cleanly, restore the last known-good 
 
 ```sh
 sudo systemctl stop <MIHOMO_UNIT>
-sudo install -m 600 "/var/backups/<MIHOMO_DIR>-config-<UTC_TIMESTAMP>.yaml" /etc/<MIHOMO_DIR>/config.yaml
-sudo install -m 644 "/var/backups/<MIHOMO_UNIT>-<UTC_TIMESTAMP>.service" /etc/systemd/system/<MIHOMO_UNIT>.service
+CONFIG_WAS_ABSENT="<true|false>"  # copy this fact from the preflight backup record
+UNIT_WAS_ABSENT="<true|false>"    # copy this fact from the preflight backup record
+if [ -f "/var/backups/<MIHOMO_DIR>-config-<UTC_TIMESTAMP>.yaml" ]; then
+  sudo install -m 600 "/var/backups/<MIHOMO_DIR>-config-<UTC_TIMESTAMP>.yaml" /etc/<MIHOMO_DIR>/config.yaml
+elif [ "$CONFIG_WAS_ABSENT" = true ]; then
+  sudo rm -f /etc/<MIHOMO_DIR>/config.yaml
+else
+  printf '%s\\n' 'Config backup is missing; stop and do not guess.' >&2
+  exit 1
+fi
+if [ -f "/var/backups/<MIHOMO_UNIT>-<UTC_TIMESTAMP>.service" ]; then
+  sudo install -m 644 "/var/backups/<MIHOMO_UNIT>-<UTC_TIMESTAMP>.service" /etc/systemd/system/<MIHOMO_UNIT>.service
+elif [ "$UNIT_WAS_ABSENT" = true ]; then
+  sudo systemctl disable <MIHOMO_UNIT> 2>/dev/null || true
+  sudo rm -f /etc/systemd/system/<MIHOMO_UNIT>.service
+else
+  printf '%s\\n' 'Unit backup is missing; stop and do not guess.' >&2
+  exit 1
+fi
 sudo systemctl daemon-reload
-sudo systemctl start <MIHOMO_UNIT>
-sudo systemctl is-active <MIHOMO_UNIT>
+if [ "$UNIT_WAS_ABSENT" = true ]; then
+  printf '%s\\n' 'Fresh-install unit and config removed; no service restarted.'
+else
+  sudo systemctl start <MIHOMO_UNIT>
+  sudo systemctl is-active <MIHOMO_UNIT>
+fi
 ```
 
-For qdisc/BBR/MTU experiments, restore the captured values immediately. For client changes, restore the previous profile and disable the new proxy before retesting. Preserve the VLESS fallback whenever Hysteria2 is being evaluated.
+For qdisc/BBR/MTU experiments, restore the captured values immediately. For client changes, restore the previous profile and disable the new proxy before retesting. Preserve the VLESS fallback whenever Hysteria2 is being evaluated. The `CONFIG_WAS_ABSENT` and `UNIT_WAS_ABSENT` values must come from the pre-mutation record; never set them by guesswork.
 
 ## One-variable rule
 
