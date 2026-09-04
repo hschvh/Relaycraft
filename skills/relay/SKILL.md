@@ -1,9 +1,9 @@
 ---
-name: self-hosted-node-setup
+name: relay
 description: Use when setting up or diagnosing an authorized self-hosted proxy node on a VPS, especially VLESS/REALITY or Hysteria2 with a residential HTTP/SOCKS5 upstream, Mihomo/Clash clients, subscriptions, or high-latency/packet-loss symptoms.
 ---
 
-# Self-Hosted Node Setup
+# Relay
 
 Use this skill only for user-owned or explicitly authorized VPS, proxy-account, and client environments.
 

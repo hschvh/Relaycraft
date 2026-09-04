@@ -1,0 +1,3 @@
+interface:
+  display_name: "Relay"
+  short_description: "Authorized self-hosted node and proxy workflows"
