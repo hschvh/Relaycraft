@@ -35,8 +35,16 @@ Before editing a config, unit, binary, qdisc, BBR, MTU, or client profile, creat
 
 ```sh
 STAMP="<UTC_TIMESTAMP>"
-sudo install -m 600 /etc/<MIHOMO_DIR>/config.yaml "/var/backups/<MIHOMO_DIR>-config-${STAMP}.yaml"
-sudo cp /etc/systemd/system/<MIHOMO_UNIT>.service "/var/backups/<MIHOMO_UNIT>-${STAMP}.service"
+if [ -f /etc/<MIHOMO_DIR>/config.yaml ]; then
+  sudo install -m 600 /etc/<MIHOMO_DIR>/config.yaml "/var/backups/<MIHOMO_DIR>-config-${STAMP}.yaml"
+else
+  printf '%s\\n' 'No existing Mihomo config; record this before creating a new one.'
+fi
+if [ -f /etc/systemd/system/<MIHOMO_UNIT>.service ]; then
+  sudo cp /etc/systemd/system/<MIHOMO_UNIT>.service "/var/backups/<MIHOMO_UNIT>-${STAMP}.service"
+else
+  printf '%s\\n' 'No existing unit; record this before creating a new one.'
+fi
 # Record the exact, reviewed restore command next to these files.
 ```
 

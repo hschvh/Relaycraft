@@ -45,16 +45,25 @@ Some providers encode credentials in a URL, require an IP allowlist, or use a se
 
 ## Interactive exit-IP test
 
-Run on the authorized VPS with a prompt or protected environment variable so the secret is not shell history or process arguments:
+Run on the authorized VPS with a prompt and a restricted temporary netrc. The proxy argument contains no username or password, so credentials do not appear in process arguments or shell history:
 
 ```sh
+NETRC_FILE="$(mktemp)"
+chmod 600 "$NETRC_FILE"
+cleanup() { rm -f "$NETRC_FILE"; unset UPSTREAM_PASSWORD; }
+trap cleanup EXIT
 read -r -s UPSTREAM_PASSWORD
-export UPSTREAM_PASSWORD
+{
+  printf 'machine <RES_HOST>\\nlogin <RES_USER>\\npassword '
+  printf '%s\\n' "$UPSTREAM_PASSWORD"
+} > "$NETRC_FILE"
 curl --silent --show-error --fail \
-  --proxy "http://<RES_USER>:${UPSTREAM_PASSWORD}@<RES_HOST>:<RES_PORT>" \
+  --netrc-file "$NETRC_FILE" \
+  --proxy "http://<RES_HOST>:<RES_PORT>" \
   https://<IP_CHECK_HOST>/ | sed -E 's/[0-9a-fA-F:.]+/<REDACTED_IP>/g'
-unset UPSTREAM_PASSWORD
 ```
+
+Do not log the temporary file or its contents; the exit trap removes it even when the request fails.
 
 Confirm the returned address is the purchased residential exit, repeat at least three times, and compare timestamps. Do not paste the raw response or proxy URL into chat. If authentication fails, first verify the provider's auth variant, allowlist, TLS requirement, and clock; then stop before changing the node.
 

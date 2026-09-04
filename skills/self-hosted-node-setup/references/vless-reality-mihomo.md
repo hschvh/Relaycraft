@@ -34,6 +34,18 @@ If the architecture, checksum, or version check does not match, stop before inst
 
 Generate a new UUID, a new REALITY X25519 keypair, and a new random Short ID for every deployment using the Mihomo release's documented generator. Keep the private key in a root-readable server file only; deliver the public key and non-secret parameters to the client. Never reuse values from examples or another node.
 
+Use the installed release's documented generator or equivalent local tools, with output redirected to a restricted file rather than chat. A generic placeholder pattern is:
+
+```sh
+umask 077
+<MIHOMO_BINARY_NAME> generate uuid > /tmp/<UUID_FILE>
+<MIHOMO_BINARY_NAME> generate reality-keypair > /tmp/<REALITY_KEYPAIR_FILE>
+head -c <SHORT_ID_BYTES> /dev/urandom | od -An -tx1 | tr -d ' \\n' > /tmp/<SHORT_ID_FILE>
+test -s /tmp/<UUID_FILE> && test -s /tmp/<REALITY_KEYPAIR_FILE> && test -s /tmp/<SHORT_ID_FILE>
+```
+
+Subcommands and output formats vary by release: check `<MIHOMO_BINARY_NAME> help` and the signed release documentation before running. Verify that the UUID and Short ID have the expected format, that the keypair contains distinct public/private values, and then move only the private value to a root-readable server file. Never print these files or commit them.
+
 ## Placeholder server configuration
 
 Create a restricted server config only after backing up any existing config. The private key placeholder below is server-only:
