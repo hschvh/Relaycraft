@@ -1,6 +1,6 @@
 ---
 name: self-hosted-node-setup
-description: Use when setting up or diagnosing an authorized self-hosted proxy node on a VPS, especially VLESS/REALITY or Hysteria2 with a residential HTTP/SOCKS5 upstream, Mihomo/Clash clients, subscriptions, or slowness and packet-loss symptoms.
+description: Use when setting up or diagnosing an authorized self-hosted proxy node on a VPS, especially VLESS/REALITY or Hysteria2 with a residential HTTP/SOCKS5 upstream, Mihomo/Clash clients, subscriptions, or high-latency/packet-loss symptoms.
 ---
 
 # Self-Hosted Node Setup
@@ -15,7 +15,7 @@ Hard invariants:
 - Do not ask for, store, or paste passwords, UUIDs, private keys, Short IDs, subscription URLs, or tokens into chat or git.
 - Do not stop, overwrite, or seize an existing Nginx, Caddy, Xray, x-ui, or similar service.
 - Keep UDP disabled until provider support or end-to-end behavior is verified.
-- If a lower layer fails, stop there, collect redacted evidence, and do not stack extra changes on top.
+- If a lower layer fails, stop there. Collect redacted evidence and do not stack extra changes on top.
 - Back up before mutation and keep a rollback command beside every change.
 
 Read only the references that match the current topology or symptom:
