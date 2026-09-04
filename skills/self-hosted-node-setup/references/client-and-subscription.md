@@ -1,51 +1,55 @@
 # Client and Subscription
 
-Use this file for Mihomo client setup, subscription import, and client-side verification.
+Use this reference for an authorized Mihomo/Clash client after the server-side baseline has passed its gates.
 
-## Client placeholders
+## Offline placeholder configuration
 
-Keep proxy, proxy-group, and rule examples generic:
+Validate a local copy before import. Keep UUIDs, public keys, Short IDs, subscription tokens, and URLs out of chat and Git; the placeholders below are not deployable values.
 
 ```yaml
 proxies:
-  - name: <NODE>
+  - name: <NODE_NAME>
     type: vless
     server: <VPS_PUBLIC_IP>
-```
+    port: <TCP_PORT>
+    uuid: <NEW_UUID>
+    tls: true
+    servername: <REALITY_TARGET_HOST>
+    reality-opts:
+      public-key: <SERVER_PUBLIC_KEY>
+      short-id: <NEW_SHORT_ID>
+    udp: false
 
-```yaml
 proxy-groups:
   - name: <PROXY_GROUP>
     type: select
-    proxies:
-      - <NODE>
-      - DIRECT
-```
+    proxies: [<NODE_NAME>, DIRECT]
 
-```yaml
 rules:
-  - MATCH,<PROXY_GROUP>
+  - DOMAIN-SUFFIX,<TARGET_DOMAIN>,<PROXY_GROUP>
+  - MATCH,DIRECT
 ```
 
-## TUN vs system proxy
+Use the installed client version's documented parser in offline mode, for example its `-t`/`--test` option. Do not import an unverified subscription into a production profile. If parsing fails, stop and correct syntax before network tests.
 
-Treat TUN mode and system proxy as different routing layers. Enable only the one you need for the current check unless the test explicitly requires both.
+## TUN and system proxy
+
+TUN captures traffic at the interface layer; a system proxy changes applications that honor proxy settings. Enable only the layer required by the current test. Running both can create loops, duplicate DNS handling, or make an apparent latency problem look like a server failure. Record which mode was active for every sample.
 
 ## Measured toggles
 
-IPv6 and `tcp-concurrent` are measured toggles, not universal fixes. Change one variable at a time and keep the baseline available for comparison.
+Treat IPv6 and `tcp-concurrent` as experiments, not universal fixes. Capture the baseline, change one toggle, repeat the same target and payload, and revert if it does not improve the agreed metrics. Keep `udp: false` unless the full upstream path is known to support UDP.
 
-## Subscription hygiene
+## File permissions and subscriptions
 
-- Validate the config offline before import.
-- Check file permissions before exposing a subscription file.
-- Import only the non-secret data needed for the client.
-- Do not paste live subscription URLs or tokens into chat.
+Store local configs with restrictive permissions (for example `chmod 600 <CONFIG_FILE>`), ensure the client process can read them, and never place a live subscription URL or token in shell history, issue text, logs, or screenshots. When a subscription is required, import it through the client's normal authenticated UI or a protected file, then remove temporary copies according to the client's documented procedure.
 
-## Exit-IP verification
+## Import and exit verification
 
-After import, confirm the chosen proxy really exits from the intended address. If the exit is wrong, stop and diagnose the upstream or routing layer before changing more client options.
+1. Back up the last known-good client profile.
+2. Run offline syntax validation and inspect the selected proxy/group/rules.
+3. Import or reload the profile through the client UI/CLI and confirm the expected node is selected.
+4. Verify an HTTPS request and the redacted exit IP through the proxy; verify DNS behavior separately.
+5. Confirm the existing direct route still works, then test restart recovery.
 
-## Recovery rule
-
-If the client parses but traffic still fails, return to the last known-good baseline and isolate the smallest changed option.
+If the exit is the VPS datacenter address instead of the intended residential address, stop at routing/upstream diagnosis. Do not compensate by enabling TUN, IPv6, concurrent connections, or UDP blindly. Restore the previous profile if the import or health check fails.
