@@ -1,3 +1,3 @@
 interface:
-  display_name: "Self Hosted Node Setup"
-  short_description: "Help with Self Hosted Node Setup tasks"
+  display_name: "Self-hosted proxy node setup"
+  short_description: "Help with authorized self-hosted proxy node setup and diagnosis"
