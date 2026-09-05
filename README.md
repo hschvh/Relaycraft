@@ -6,7 +6,11 @@ Safety-first skills for authorized self-hosted relay and proxy workflows.
 Relaycraft 将可重复的部署、验证、诊断和回滚经验整理为可发现的 Codex skills。第一个技能 `relay` 覆盖自建 VPS 节点、住宅上游代理、Mihomo/Clash 客户端、性能对比和可恢复回滚。\
 Relaycraft turns repeatable deployment, verification, diagnosis, and rollback practices into discoverable Codex skills. The first skill, `relay`, covers self-hosted VPS nodes, residential upstream proxies, Mihomo/Clash clients, performance comparisons, and recoverable rollback.
 
+[中文](#中文) | [English](#english)
+
 ## 中文
+
+[切换到 English](#english)
 
 ### 范围与安全
 
@@ -98,6 +102,8 @@ skills/relay/
 示例必须只使用占位符，保留授权使用边界；新增工作流时必须补充验证或回滚门槛。不要提交真实凭据或供应商专属秘密。
 
 ## English
+
+[Switch to 中文](#中文)
 
 ### Scope and safety
 
